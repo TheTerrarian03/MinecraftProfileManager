@@ -1,0 +1,17 @@
+PROGRAM FUNCTIONALITY
+[ ] - graphical ui
+[ ] - default profile setting
+[*] - profile saving
+[*] - profile editing
+[ ] - profile adding
+[ ] - profile removing
+[*] - options.txt editing
+[*] - optionsshaders.txt editing
+[ ] - launcher_accounts.json editing
+[ ] - python dependencies window
+[ ] - (maybe) a window for custom path setting, for minecraft launcher, options.txt loc, etc
+
+OS COMPATABILITY
+[ ] - Windows (with .bat files)
+[ ] - MacOS (with _ files)
+[ ] - Linux (with _ files)
