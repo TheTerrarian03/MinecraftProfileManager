@@ -1,7 +1,9 @@
 import tkinter as tk
-from tkinter import ttk, messagebox, simpledialog
-from ProfileJSONManager import ProfileManager, get_default_path_to_json
+from tkinter import ttk, messagebox, simpledialog, filedialog
+from ProfileJSONManager import ProfileManager
 from write_settings import write_settings
+import DirectoryManager
+import os
 
 class ProfileManagerApp:
     def __init__(self, root):
@@ -13,6 +15,8 @@ class ProfileManagerApp:
 
         self.create_main_menu_buttons()
 
+        self.check_for_menu_errors()
+
         self.current_frame = self.main_menu_frame  # Set main menu as current frame
 
     def create_main_menu_buttons(self):
@@ -22,12 +26,18 @@ class ProfileManagerApp:
             ("Write profile", self.write_profile),
             ("Run Minecraft", self.run_minecraft),
             ("Manage Program Dependencies", self.show_manage_dependencies_frame),
-            ("Exit Program", self.root.quit)  # Add exit button
+            ("Manage File Paths", self.show_manage_paths_frame),
+            ("Exit Program", self.root.quit)
         ]
+
+        self.main_menu_buttons = {}
 
         for label, command in button_labels:
             button = tk.Button(self.main_menu_frame, text=label, command=command)
             button.pack(fill=tk.X, padx=10, pady=5)
+            self.main_menu_buttons[label] = button
+        
+        print(self.main_menu_buttons)
 
     def show_frame(self, frame_to_show):
         if hasattr(self, 'current_frame'):
@@ -129,7 +139,7 @@ class ProfileManagerApp:
         self.show_frame(edit_profiles_frame)
 
     def write_profile(self):
-        profile_name = ProfileManager(file_path=get_default_path_to_json()).get_default_profile_name()
+        profile_name = ProfileManager(file_path=DirectoryManager.LastSavedPathLoc.get_path()).get_default_profile_name()
         print(f"Attempting to write settings for profile {profile_name}...")
         write_settings(get_default_path_to_json(), profile_name)
         print(f"...Done!")
@@ -142,10 +152,74 @@ class ProfileManagerApp:
         manage_dependencies_frame = self.create_basic_frame("Manage Program Dependencies", self.show_main_menu_frame)
         self.show_frame(manage_dependencies_frame)
 
+    def show_manage_paths_frame(self):
+        manage_paths_frame = self.create_basic_frame("Manage File Paths", self.show_main_menu_frame)
+        
+        profiles_json_path = self.paths_get_profile_json()
+        if profiles_json_path == "": profiles_json_path = "Please choose"
+
+        profile_json_label = tk.Label(manage_paths_frame, text=profiles_json_path)
+        profile_json_label.pack()
+
+        profile_json_choose_default_button = tk.Button(manage_paths_frame, text="Set to Default", command=)
+
+        self.show_frame(manage_paths_frame)
+
     def show_main_menu_frame(self):
+        self.check_for_menu_errors()
         self.show_frame(self.main_menu_frame)
 
-    # ----- CHOOSE DEFAULT FRAME FUNCTIONS -----
+    def check_for_menu_errors(self):
+        # program deps
+        
+        # paths
+        warnings = 0
+
+        profiles_json_exists = self.paths_check_saved_profile_exists()
+        if not profiles_json_exists:
+            warnings += 1
+        
+
+
+        if warnings > 0:
+            self.main_menu_buttons["Manage File Paths"].config(bg="red")
+        else:
+            self.main_menu_buttons["Manage File Paths"].config(bg="SystemButtonFace")
+
+    # ----- MANAGE PATHS FUNCTIONS -----
+
+    def paths_get_profile_json(self):
+        # first try to read path from txt file in same folder
+        saved_path_file = os.path.dirname(os.path.abspath(__file__)) + "\\profilesjsonpath.txt"
+        with open(saved_path_file, "r") as file:
+            line = file.readline()
+            saved_path = line
+        
+        if os.path.exists(saved_path):
+            return saved_path
+        else:
+            messagebox.showerror("Profiles JSON missing!", "The JSON file for profiles, at the last saved location, is missing!")
+            user_try_default = messagebox.askyesno("Profiles JSON missing!", "Would you like to try the default location?")
+        
+        # else if user specifies try default path
+        if user_try_default:
+            default_path = get_default_path_to_json()
+            print(default_path)
+            if os.path.exists(default_path):
+                self.paths_set_saved_profile_json(default_path)
+                return default_path
+            else:
+                messagebox.showerror("Profiles JSON missing!", "It appears it is also not at the default. Please choose an option in the menu")
+        
+        return ""
+
+    def paths_set_saved_profile_json(self, new_path):
+        saved_path_file = os.path.dirname(os.path.abspath(__file__)) + "\\profilesjsonpath.txt"
+        with open(saved_path_file, "w") as file:
+            file.write(new_path)
+
+
+    # ----- CHOOSE DEFAULT PROFILE FRAME FUNCTIONS -----
 
     def get_existing_profiles(self):
         json_manager = ProfileManager(file_path=get_default_path_to_json())

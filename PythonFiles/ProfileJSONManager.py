@@ -1,10 +1,7 @@
 import json
+import os
+from tkinter import messagebox
 
-
-DEF_PROF_JSON_NAME = "profiles.json"
-
-def get_default_path_to_json():
-    return __file__[:__file__.rfind("\\")+1] + DEF_PROF_JSON_NAME
 
 class ProfileManager:
     def __init__(self, file_path):
@@ -48,7 +45,7 @@ class ProfileManager:
             del self.data["profiles"][profile_name]
             self.save_changes()
 
-    def set_default_profile(self, profile_name, first_profile_on_error=True):
+    def set_default_profile(self, profile_name):
         profile_exists = False
 
         for profile in self.get_profile_names():
