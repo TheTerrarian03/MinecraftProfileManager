@@ -4,5 +4,6 @@ response = MsgBox(messageText, vbYesNo + vbExclamation, "Minecraft Profile Manag
 
 If response = vbYes Then
     Set objShell = CreateObject("WScript.Shell")
-    objShell.Run "https://www.python.org/downloads/", 1, True
+    ' objShell.Run "https://www.python.org/downloads/", 1, True
+    objShell.Run "python"
 End If

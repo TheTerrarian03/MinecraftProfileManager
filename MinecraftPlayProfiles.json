@@ -59,10 +59,12 @@
             "bat_options": {
                 "run_offline": false,
                 "change_name": true,
-                "new_name": "loganos",
-                "auto_click_play": false
+                "new_name": "logannnnn",
+                "auto_click_play": true
             },
-            "options.txt": {},
+            "options.txt": {
+                "toggleCrouch": "true"
+            },
             "optionsshaders.txt": {}
         }
     }

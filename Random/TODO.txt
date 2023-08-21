@@ -10,8 +10,10 @@ PROGRAM FUNCTIONALITY
 [ ] - launcher_accounts.json editing
 [ ] - python dependencies window
 [ ] - (maybe) a window for custom path setting, for minecraft launcher, options.txt loc, etc
+[ ] - add backend logic for dealing with json or txt files being empty
+[ ] - add try/catch logic for, well, literally everything
 
 OS COMPATABILITY
 [ ] - Windows (with .bat files)
-[ ] - MacOS (with _ files)
-[ ] - Linux (with _ files)
+[ ] - MacOS (with .app files)
+[ ] - Linux (with .sh files)

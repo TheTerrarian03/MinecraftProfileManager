@@ -4,13 +4,10 @@ setlocal
 REM Check if Python 3 is installed
 python --version 2>NUL
 if %errorlevel% neq 0 (
-    echo Python 3 is not installed on this system.
-    echo Asking user for permission to continue
-    
     REM Launch graphical message box
-    cscript //nologo ask_install_python.vbs "Python 3 is not installed on this system, and is required. Do you want the link to install Python to be opened for you?"
+    cscript //nologo %~dp0..\WindowsScripts\ask_install_python.vbs "Python 3 is not installed on this system, and is required. Do you want the link to install Python to be opened for you?"
 
-    cscript //nologo send_message.vbs "Please re-run this program once Python has been successfully installed. Thanks!"
+    cscript //nologo %~dp0..\WindowsScripts\send_message.vbs "Please re-run this program once Python has been successfully installed. Thanks!"
 
     exit
 )
@@ -19,10 +16,10 @@ set TRUE=1==1
 set FALSE=1==0
 
 : write settings for profile
-start /wait python3 ..\PythonFiles\write_settings.py
+start /wait python3 %~dp0..\PythonFiles\write_settings.py
 
 : assign settings file
-set SETTINGS_FILE=..\run_settings.ini
+set SETTINGS_FILE=%~dp0..\run_settings.cfg
 
 : getting bat settings
 for /f "tokens=1,2 delims==" %%a in (%SETTINGS_FILE%) do (
@@ -62,10 +59,10 @@ python -c "import subprocess; subprocess.Popen(['C:\Program Files (x86)\Minecraf
 : run press button
 if %AUTOCLICK% (
     : run python script to look for button to press
-    python3 ..\PythonFiles\auto_click_play.py ..\mc_play_buttons\ 30
+    python3 %~dp0..\PythonFiles\auto_click_play.py ..\mc_play_buttons\ 30
 ) else (
     : pause and ask user to press enter when minecraft played
-    cscript //nologo send_message.vbs "Please press ENTER or RETURN here once you have pressed the PLAY button."
+    cscript //nologo %~dp0..\WindowsScripts\send_message.vbs "Please press ENTER or RETURN here once you have pressed the PLAY button."
 )
 
 if %OFFLINE% (

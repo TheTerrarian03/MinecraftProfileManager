@@ -4,6 +4,8 @@ from ProfileJSONManager import ProfileManager
 from write_settings import write_settings
 import DirectoryManager
 import os
+import subprocess
+import json
 
 class ProfileManagerApp:
     def __init__(self, root):
@@ -37,7 +39,7 @@ class ProfileManagerApp:
             button.pack(fill=tk.X, padx=10, pady=5)
             self.main_menu_buttons[label] = button
         
-        print(self.main_menu_buttons)
+        # print(self.main_menu_buttons)
 
     def show_frame(self, frame_to_show):
         if hasattr(self, 'current_frame'):
@@ -61,7 +63,7 @@ class ProfileManagerApp:
         choose_default_frame = self.create_basic_frame("Choose Default Profile", self.show_main_menu_frame)
         
         profiles = self.get_existing_profiles()  # Replace with your code to get preset profiles
-        self.selected_profile = tk.StringVar(value=profiles[0] if profiles else "")
+        self.selected_profile = tk.StringVar(value=self.get_default_profile() if profiles else "")
 
         profile_combobox = ttk.Combobox(choose_default_frame, textvariable=self.selected_profile, values=profiles)
         profile_combobox.pack()
@@ -75,9 +77,10 @@ class ProfileManagerApp:
         edit_profiles_frame = self.create_basic_frame("Edit Profiles", self.show_main_menu_frame)
         
         edit_profiles = self.get_existing_profiles()  # Replace with your code to get preset profiles
-        self.selected_edit_profile = tk.StringVar(value=edit_profiles[0] if edit_profiles else "")
+        self.selected_edit_profile = tk.StringVar(value=self.get_default_profile() if edit_profiles else "")
 
         profile_combobox = ttk.Combobox(edit_profiles_frame, textvariable=self.selected_edit_profile, values=edit_profiles)
+        profile_combobox.bind("<<ComboboxSelected>>", lambda event: self.load_profile(customization_dict))
         profile_combobox.pack()
 
         self.reset_profiles_list = lambda: profile_combobox.config(values=self.get_existing_profiles())
@@ -136,17 +139,27 @@ class ProfileManagerApp:
 
         load_profile_button.config(command=lambda: self.load_profile(customization_dict))
 
+        if self.selected_edit_profile:
+            self.load_profile(customization_dict)
+
         self.show_frame(edit_profiles_frame)
 
     def write_profile(self):
-        profile_name = ProfileManager(file_path=DirectoryManager.LastSavedPathLoc.get_path()).get_default_profile_name()
+        profile_name = ProfileManager(file_path=DirectoryManager.get_prof_path()).get_default_profile_name()
         print(f"Attempting to write settings for profile {profile_name}...")
-        write_settings(get_default_path_to_json(), profile_name)
+        write_settings(DirectoryManager.get_prof_path(), profile_name)
         print(f"...Done!")
 
     def run_minecraft(self):
-        run_minecraft_frame = self.create_basic_frame("Run Minecraft", self.show_main_menu_frame)
-        self.show_frame(run_minecraft_frame)
+        platform = DirectoryManager.get_platform()
+        if platform == "mac":
+            raise NotImplementedError("Unsupported Platform")
+        elif platform == "linux":
+            raise NotImplementedError("Unsupported Platform")
+        elif platform == "windows":
+            subprocess.call(DirectoryManager.WINDOWS_RUN_BAT_PATH, shell=True)
+        else:
+            raise NotImplementedError("Unsupported Platform")
 
     def show_manage_dependencies_frame(self):
         manage_dependencies_frame = self.create_basic_frame("Manage Program Dependencies", self.show_main_menu_frame)
@@ -155,13 +168,17 @@ class ProfileManagerApp:
     def show_manage_paths_frame(self):
         manage_paths_frame = self.create_basic_frame("Manage File Paths", self.show_main_menu_frame)
         
-        profiles_json_path = self.paths_get_profile_json()
-        if profiles_json_path == "": profiles_json_path = "Please choose"
+        profiles_json_path = DirectoryManager.get_prof_path()
+        if profiles_json_path == "": profiles_json_path = "Invalid- Please choose"
 
         profile_json_label = tk.Label(manage_paths_frame, text=profiles_json_path)
         profile_json_label.pack()
 
-        profile_json_choose_default_button = tk.Button(manage_paths_frame, text="Set to Default", command=)
+        profile_json_choose_default_button = tk.Button(manage_paths_frame, text="Set to Default", command=self.set_profile_json_to_default)
+        profile_json_choose_default_button.pack(side=tk.LEFT)
+        
+        profile_json_choose_custom_buttom = tk.Button(manage_paths_frame, text="Set to Custom", command=self.set_profile_json_to_chosen)
+        profile_json_choose_custom_buttom.pack(side=tk.LEFT)
 
         self.show_frame(manage_paths_frame)
 
@@ -175,58 +192,34 @@ class ProfileManagerApp:
         # paths
         warnings = 0
 
-        profiles_json_exists = self.paths_check_saved_profile_exists()
+        profiles_json_exists = DirectoryManager.check_prof_file_exists()
         if not profiles_json_exists:
             warnings += 1
-        
-
 
         if warnings > 0:
             self.main_menu_buttons["Manage File Paths"].config(bg="red")
         else:
             self.main_menu_buttons["Manage File Paths"].config(bg="SystemButtonFace")
 
-    # ----- MANAGE PATHS FUNCTIONS -----
+    # ----- PATH MANAGER FUNCTIONS -----
 
-    def paths_get_profile_json(self):
-        # first try to read path from txt file in same folder
-        saved_path_file = os.path.dirname(os.path.abspath(__file__)) + "\\profilesjsonpath.txt"
-        with open(saved_path_file, "r") as file:
-            line = file.readline()
-            saved_path = line
-        
-        if os.path.exists(saved_path):
-            return saved_path
-        else:
-            messagebox.showerror("Profiles JSON missing!", "The JSON file for profiles, at the last saved location, is missing!")
-            user_try_default = messagebox.askyesno("Profiles JSON missing!", "Would you like to try the default location?")
-        
-        # else if user specifies try default path
-        if user_try_default:
-            default_path = get_default_path_to_json()
-            print(default_path)
-            if os.path.exists(default_path):
-                self.paths_set_saved_profile_json(default_path)
-                return default_path
-            else:
-                messagebox.showerror("Profiles JSON missing!", "It appears it is also not at the default. Please choose an option in the menu")
-        
-        return ""
-
-    def paths_set_saved_profile_json(self, new_path):
-        saved_path_file = os.path.dirname(os.path.abspath(__file__)) + "\\profilesjsonpath.txt"
-        with open(saved_path_file, "w") as file:
-            file.write(new_path)
-
+    def set_profile_json_to_default(self):
+        DirectoryManager.set_new_prof_saved(DirectoryManager.DEF_PROF_JSON_PATH)
+    
+    def set_profile_json_to_chosen(self):
+        return filedialog.askopenfilename(filetypes=[("JSON Files", "*.json")])
 
     # ----- CHOOSE DEFAULT PROFILE FRAME FUNCTIONS -----
 
     def get_existing_profiles(self):
-        json_manager = ProfileManager(file_path=get_default_path_to_json())
+        json_manager = ProfileManager(file_path=DirectoryManager.get_prof_path())
         return json_manager.get_profile_names()
     
+    def get_default_profile(self):
+        return ProfileManager(file_path=DirectoryManager.get_prof_path()).get_default_profile_name()
+
     def set_default_profile(self, profile_name):
-        json_manager = ProfileManager(file_path=get_default_path_to_json())
+        json_manager = ProfileManager(file_path=DirectoryManager.get_prof_path())
         json_manager.set_default_profile(profile_name)
         print(f"Set default profile to: {profile_name}")
     
@@ -238,7 +231,7 @@ class ProfileManagerApp:
             print(f"Loading profile: {selected_profile}")
             
             # get profile data from JSON
-            profile_data = ProfileManager(get_default_path_to_json()).get_data_for_profile(selected_profile)
+            profile_data = ProfileManager(DirectoryManager.get_prof_path()).get_data_for_profile(selected_profile)
             bat_options = profile_data["bat_options"]
 
             # batch file options
@@ -275,7 +268,7 @@ class ProfileManagerApp:
             new_profile_name = simpledialog.askstring("New Profile", "Please enter a name for the new profile:")
 
         # make new JSON profile
-        json_handler = ProfileManager(get_default_path_to_json())
+        json_handler = ProfileManager(DirectoryManager.get_prof_path())
         json_handler.update_profile(new_profile_name)
 
         self.selected_edit_profile.set(new_profile_name)
@@ -292,7 +285,7 @@ class ProfileManagerApp:
         if selected_profile:
             is_user_sure = messagebox.askyesno("Remove Profile", f"Are you sure you want to remove {selected_profile}?")
             if is_user_sure:
-                ProfileManager(get_default_path_to_json()).delete_profile(selected_profile)
+                ProfileManager(DirectoryManager.get_prof_path()).delete_profile(selected_profile)
                 self.reset_profiles_list()
                 self.selected_edit_profile.set(self.get_existing_profiles()[0])
                 print(f"Removed profile: {selected_profile}")
@@ -321,12 +314,12 @@ class ProfileManagerApp:
                 except ValueError:
                     print("Error (non-critical): Invalid custom value in optionsshaders.txt")
 
-            ProfileManager(get_default_path_to_json()).update_profile(selected_profile,
-                                                                      customization_dict["offline_var"].get(),
-                                                                      customization_dict["change_name_var"].get(),
-                                                                      customization_dict["new_name_var"].get(),
-                                                                      customization_dict["auto_click_var"].get(),
-                                                                      options_dict, options_shaders_dict)
+            ProfileManager(DirectoryManager.get_prof_path()).update_profile(selected_profile,
+                                                                            customization_dict["offline_var"].get(),
+                                                                            customization_dict["change_name_var"].get(),
+                                                                            customization_dict["new_name_var"].get(),
+                                                                            customization_dict["auto_click_var"].get(),
+                                                                            options_dict, options_shaders_dict)
 
             print("...Success!")
         else:
