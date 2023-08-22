@@ -59,11 +59,11 @@
             "bat_options": {
                 "run_offline": false,
                 "change_name": true,
-                "new_name": "logannnnn",
+                "new_name": "TestingName",
                 "auto_click_play": true
             },
             "options.txt": {
-                "toggleCrouch": "true"
+                "toggleCrouch": "false"
             },
             "optionsshaders.txt": {}
         }

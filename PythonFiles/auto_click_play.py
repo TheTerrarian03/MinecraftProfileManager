@@ -2,6 +2,7 @@ import pyautogui
 import time
 import os
 import sys
+import DirectoryManager
 
 def get_button_image_paths(folder_path):
     image_paths = []
@@ -40,12 +41,13 @@ if __name__ == '__main__':
     try:
         CWD = sys.argv[1]
     except IndexError:
-        CWD = "C:\\Users\\thete\\AppData\\Roaming\\.minecraft\\CUSTOM_SCRIPTS\\mc_play_buttons\\"
+        # CWD = "C:\\Users\\thete\\AppData\\Roaming\\.minecraft\\CUSTOM_SCRIPTS\\mc_play_buttons\\"
+        CWD = DirectoryManager.MC_BUTTONS_FOLDER_PATH
     
     try:
         MAX_TIME = int(sys.argv[2])
     except (IndexError, ValueError):
-        MAX_TIME = 10
+        MAX_TIME = 20
     
     print(MAX_TIME, CWD)
 

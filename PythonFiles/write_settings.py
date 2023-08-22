@@ -29,6 +29,7 @@ def write_settings(json_path, profile):
     if profile_data["bat_options"]["change_name"] == True:
         # load data in the launcher_accounts.json file
         data = json.load(open(acc_path, "r"))
+        print(data)
 
         # add ids to a list for later use
         account_ids = []
@@ -37,7 +38,7 @@ def write_settings(json_path, profile):
 
         # change name for each id to the new desired name
         for account_id in account_ids:
-            data["accounts"][account_id]["minecraftProfile"]["name"] = "banana"
+            data["accounts"][account_id]["minecraftProfile"]["name"] = profile_data["bat_options"]["new_name"]
 
         # write new and updated data back to the launcher_accounts.json file
         json.dump(data, open(acc_path, "w"), indent=2)

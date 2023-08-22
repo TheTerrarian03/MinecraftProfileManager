@@ -21,6 +21,10 @@ PROGRAM_PATHS_PATH = os.path.join(PYTHON_FILES_FOLDER, PROGRAM_PATHS_NAME)
 DEF_PROF_JSON_NAME = "MinecraftPlayProfiles.json"
 DEF_PROF_JSON_PATH = os.path.join(PROFILE_MANAGER_FOLDER, DEF_PROF_JSON_NAME)
 
+# Minecraft buttons folder
+MC_BUTTONS_FOLDER_NAME = "MinecraftPlayButtons"
+MC_BUTTONS_FOLDER_PATH = os.path.join(PROFILE_MANAGER_FOLDER, MC_BUTTONS_FOLDER_NAME)
+
 # paths to scripts for running minecraft from ui
 WINDOWS_RUN_BAT_PATH = os.path.join(WINDOWS_SCRIPTS_FOLDER, "RunMinecraft.bat")
 
@@ -78,11 +82,11 @@ def get_default_minecraft_folder():
         elif platform.system() == 'Linux':  # Linux
             minecraft_path = os.path.expanduser("~/.minecraft")
     elif os.name == 'nt':  # Windows
-        path = os.path.expanduser("~\\AppData\\Roaming\\.minecraft")
+        minecraft_path = os.path.expanduser("~\\AppData\\Roaming\\.minecraft")
     else:
         raise NotImplementedError("Unsupported platform")
 
-    return path
+    return minecraft_path
 
 def get_platform():
     if os.name == "posix":  # maxOS/Linux
