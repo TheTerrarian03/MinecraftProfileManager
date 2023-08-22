@@ -1,0 +1,8 @@
+--- Windows ---
+Video: https://www.youtube.com/watch?v=UZX5kH72Yx4
+- use pyinstaller
+- use nsis software
+
+--- Mac ---
+Video: https://www.youtube.com/watch?v=DVOoHL2Bp_o
+- use py2app
