@@ -16,6 +16,7 @@ def get_button_image_paths(folder_path):
 
 def main(image_paths):
     # Find the coordinates of the green play button
+    button_position = None
     for image in image_paths:
         button_position = pyautogui.locateOnScreen(image, confidence=0.9)
         if button_position is not None:
@@ -41,18 +42,26 @@ if __name__ == '__main__':
     try:
         CWD = sys.argv[1]
     except IndexError:
-        # CWD = "C:\\Users\\thete\\AppData\\Roaming\\.minecraft\\CUSTOM_SCRIPTS\\mc_play_buttons\\"
         CWD = DirectoryManager.MC_BUTTONS_FOLDER_PATH
     
     try:
         MAX_TIME = int(sys.argv[2])
     except (IndexError, ValueError):
         MAX_TIME = 20
-    
-    print(MAX_TIME, CWD)
+
+    # move mouse to bottom-right
+    screen_width, screen_height = pyautogui.size()  # Get screen resolution
+    pyautogui.moveTo(screen_width, screen_height-10)  # Move the mouse to the bottom-right corner
 
     # get image paths, saves exec time
     image_paths = get_button_image_paths(CWD)
+
+    # filter based on platform, for performance and ignoring unneeded images
+    match DirectoryManager.get_platform():
+        case "mac":
+            filtered_paths = [item for item in image_paths if "mac_" in item]
+        case "windows":
+            filtered_paths = [item for item in image_paths if "windows_" in item]
     
     # Record the start time
     start_time = time.time()
@@ -66,7 +75,7 @@ if __name__ == '__main__':
             break
 
         # run main program, which will try to click the button
-        success = main(image_paths)
+        success = main(filtered_paths)
 
         # if button found and clicked, break loop and end script
         if success:
