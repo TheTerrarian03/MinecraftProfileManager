@@ -9,6 +9,7 @@
                 "auto_click_play": true
             },
             "options.txt": {
+                "renderDistance": "10",
                 "guiScale": "3",
                 "maxFps": "80",
                 "resourcePacks": "[\"vanilla\",\"file/Faithless1.20.zip\"]",
@@ -17,9 +18,11 @@
                 "key_key.chat": "key.keyboard.enter",
                 "key_key.swapOffhand": "key.keyboard.x",
                 "key_key.loadToolbarActivator": "key.keyboard.unknown",
-                "key_key.hotbar.7": "key.keyboard.v",
-                "key_key.hotbar.8": "key.keyboard.q",
-                "key_key.hotbar.9": "key.keyboard.f"
+                "mouseWheelSensitivity": "1.0",
+                "key_key.use": "key.mouse.right",
+                "key_key.hotbar.7": "key.keyboard.7",
+                "key_key.hotbar.8": "key.keyboard.8",
+                "key_key.hotbar.9": "key.keyboard.9"
             },
             "optionsshaders.txt": {
                 "shaderPack": "Sildur's+Vibrant+Shaders+v1.50+Extreme-VL.zip",
