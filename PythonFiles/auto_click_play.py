@@ -38,16 +38,17 @@ def main(image_paths):
     return True
 
 if __name__ == '__main__':
-    # play button images path
+    # timeout
     try:
-        CWD = sys.argv[1]
-    except IndexError:
-        CWD = DirectoryManager.MC_BUTTONS_FOLDER_PATH
-    
-    try:
-        MAX_TIME = int(sys.argv[2])
+        MAX_TIME = int(sys.argv[1])
     except (IndexError, ValueError):
         MAX_TIME = 20
+    
+    # play button images path
+    try:
+        CWD = sys.argv[2]
+    except IndexError:
+        CWD = DirectoryManager.MC_BUTTONS_FOLDER_PATH
 
     # move mouse to bottom-right
     screen_width, screen_height = pyautogui.size()  # Get screen resolution
@@ -61,7 +62,7 @@ if __name__ == '__main__':
         case "mac":
             filtered_paths = [item for item in image_paths if "mac_" in item]
         case "windows":
-            filtered_paths = [item for item in image_paths if "windows_" in item]
+            filtered_paths = [item for item in image_paths if "win_" in item]
     
     # Record the start time
     start_time = time.time()

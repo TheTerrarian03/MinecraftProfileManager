@@ -1,5 +1,5 @@
 {
-    "default_profile": "Tester",
+    "default_profile": "Nova LAN",
     "profiles": {
         "Nova LAN": {
             "bat_options": {
@@ -62,9 +62,7 @@
                 "new_name": "TestingName",
                 "auto_click_play": true
             },
-            "options.txt": {
-                "toggleCrouch": "false"
-            },
+            "options.txt": {},
             "optionsshaders.txt": {}
         }
     }
