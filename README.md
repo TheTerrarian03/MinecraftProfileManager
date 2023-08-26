@@ -1,5 +1,5 @@
 # MinecraftProfileManager
-## Copied from `"PlanWithChat.md` temporarily
+## Copied from `PlanWithChat.md` temporarily
 
 My Rough plan, including things like overall considerations, adaptations of my **old, Python-powered** program, and specifics I may want to consider using when developing my **new, Rust-powered application!**
 
