@@ -25,6 +25,7 @@ mod prompts {
 
 mod menus {
     use crate::path_handler;
+    use crate::file_handler;
     use super::prompts;
 
     // MAIN MENU
@@ -40,10 +41,15 @@ mod menus {
     // READ MENU
     pub fn read_menu() {
         // call prompt
+        prompts::read_menu();
         // read and print info
         match path_handler::get_info_file_path() {
             Ok(path) => {
                 // get info from file at the path
+                match file_handler::read_file(&path) {
+                    Ok(content) => println!("File Contents:\n{}", content),
+                    Err(error) => println!("Got an error! {error}")
+                }
             },
             Err(err) => println!("Got an error: {err}")
         }
