@@ -1,5 +1,8 @@
 #![allow(non_snake_case)]
+mod ui;
+mod path_handler;
+mod file_handler;
 
 fn main() {
-    println!("Hello, Minecraft Profile Manager!");
+    ui::ui_mainloop();
 }
