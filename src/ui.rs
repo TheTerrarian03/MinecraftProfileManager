@@ -47,19 +47,19 @@ mod menus {
 
     // READ MENU
     pub fn read_menu() {
-        // call prompt
-        prompts::read_menu();
-        // read and print info
-        match path_handler::get_info_file_path() {
-            Ok(path) => {
-                // get info from file at the path
-                match file_handler::read_file(&path) {
-                    Ok(content) => println!("File Contents:\n{}", content),
-                    Err(error) => println!("Got an error! {error}")
-                }
-            },
-            Err(err) => println!("Got an error: {err}")
-        }
+        // // call prompt
+        // prompts::read_menu();
+        // // read and print info
+        // match path_handler::get_info_file_path() {
+        //     Ok(path) => {
+        //         // get info from file at the path
+        //         match file_handler::read_file(&path) {
+        //             Ok(content) => println!("File Contents:\n{}", content),
+        //             Err(error) => println!("Got an error! {error}")
+        //         }
+        //     },
+        //     Err(err) => println!("Got an error: {err}")
+        // }
     }
 
     // WRITE MENU
@@ -93,30 +93,30 @@ mod menus {
             lines.push(input)
         }
 
-        // try to get path to file
-        match path_handler::get_info_file_path() {
-            Ok(path) => {
-                // try to write content to file
-                match file_handler::write_lines_to_info_file(&path, lines) {
-                    Ok(_) => println!("Success writing to file"),
-                    Err(error) => println!("There was an error writing to file: {}", error)
-                }
-            },
-            Err(error) => println!("There was an error getting the path to the file: {}", error)
-        }
+        // // try to get path to file
+        // match path_handler::get_info_file_path() {
+        //     Ok(path) => {
+        //         // try to write content to file
+        //         match file_handler::write_lines_to_info_file(&path, lines) {
+        //             Ok(_) => println!("Success writing to file"),
+        //             Err(error) => println!("There was an error writing to file: {}", error)
+        //         }
+        //     },
+        //     Err(error) => println!("There was an error getting the path to the file: {}", error)
+        // }
     }
 
     pub fn clear_menu() {
         // call file handler to clear file
-        match path_handler::get_info_file_path() {
-            Ok(path) => {
-                match file_handler::clear_file(&path) {
-                    Ok(_) => println!("Success clearing file"),
-                    Err(error) => println!("There was an error clearing the file: {}", error)
-                }
-            },
-            Err(error) => println!("There was an error getting the path to the file: {}", error)
-        }
+        // match path_handler::get_info_file_path() {
+        //     Ok(path) => {
+        //         match file_handler::clear_file(&path) {
+        //             Ok(_) => println!("Success clearing file"),
+        //             Err(error) => println!("There was an error clearing the file: {}", error)
+        //         }
+        //     },
+        //     Err(error) => println!("There was an error getting the path to the file: {}", error)
+        // }
     }
 }
 
