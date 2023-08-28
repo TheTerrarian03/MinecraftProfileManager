@@ -39,3 +39,24 @@ pub fn read_file(file_path: &std::path::PathBuf) -> Result<String, std::io::Erro
     file.read_to_string(&mut content)?;
     Ok(content)
 }
+
+pub fn clear_file(file_path: &std::path::PathBuf) -> Result<(), std::io::Error> {
+    let mut file = File::create(file_path)?;
+
+    // ChatGPT on why this works: "Since there's nothing in the byte array, nothing is written to the file. However, the act of 
+    //   writing an empty byte array still causes the file to be truncated to zero length, effectively clearing its content."
+    file.write_all(b"")?;
+
+    Ok(())
+}
+
+pub fn write_lines_to_info_file(file_path: &std::path::PathBuf, lines: Vec<String>) -> Result<(), std::io::Error> {
+    let mut file = File::create(file_path)?;
+
+    for line in lines {
+        file.write_all(line.as_bytes())?;
+        file.write_all(b"\n")?;
+    }
+
+    Ok(())
+}

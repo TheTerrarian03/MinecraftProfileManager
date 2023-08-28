@@ -2,8 +2,14 @@
 name = "MinecraftProfileManager"
 version = "0.1.0"
 edition = "2021"
+authors = ["Logan Meyers <theterrarain03@gmail.com"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+# user and config directories, cross-platform
 dirs = "5.0.1"
+# why serde is special here: https://serde.rs/derive.html
+# for reading/writing json files
+"serde" = { version = "1.0.188", features = ["derive"] }
+"serde_json" = "1.0.105"

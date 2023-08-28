@@ -14,12 +14,17 @@ mod prompts {
         println!("MAIN MENU : Please enter an option:");
         println!("1) Read txt file");
         println!("2) Write text to txt file");
-        println!("3) Quit program");
+        println!("3) Clear file");
+        println!("4) Quit program");
         input_symbol();
     }
 
     pub fn read_menu() {
         println!("READ MENU : Here is your text:");
+    }
+
+    pub fn write_menu() {
+        println!("WRITE MENU : Please enter your lines of text, and type \"/q\" on a new line to quit and write the contents...")
     }
 }
 
@@ -27,13 +32,15 @@ mod menus {
     use crate::path_handler;
     use crate::file_handler;
     use super::prompts;
+    use std::io;
 
     // MAIN MENU
     pub fn process_main_menu_choose(option: u32) -> bool {
         match option {
             1 => { read_menu();                  false },
-            2 => { println!("Writing file");     false },
-            3 => { println!("Quitting program"); true  },
+            2 => { write_menu();                 false },
+            3 => { clear_menu();                 false },
+            4 => { println!("Quitting program"); true  },
             _ => { println!("Invalid input");    false }
         }
     }
@@ -57,7 +64,59 @@ mod menus {
 
     // WRITE MENU
     pub fn write_menu() {
-        // ask for input and write to file until QUIT only
+        // vec (similar to an array/list in Python) to hold lines of user input
+        let mut lines: Vec<String> = Vec::new();
+        
+        // prompt message
+        prompts::write_menu();
+
+        // user input loop
+        loop {
+            // var to hold new info on line
+            let mut input = String::new();
+
+            // line prompt
+            prompts::input_symbol();
+
+            // get input from stdin
+            io::stdin().read_line(&mut input).expect("Failed to read line!");
+
+            // remove trailing newline character
+            input = input.trim().to_string();
+
+            // check for quit condition
+            if input == "/q" {
+                break;
+            }
+
+            // add to list of lines
+            lines.push(input)
+        }
+
+        // try to get path to file
+        match path_handler::get_info_file_path() {
+            Ok(path) => {
+                // try to write content to file
+                match file_handler::write_lines_to_info_file(&path, lines) {
+                    Ok(_) => println!("Success writing to file"),
+                    Err(error) => println!("There was an error writing to file: {}", error)
+                }
+            },
+            Err(error) => println!("There was an error getting the path to the file: {}", error)
+        }
+    }
+
+    pub fn clear_menu() {
+        // call file handler to clear file
+        match path_handler::get_info_file_path() {
+            Ok(path) => {
+                match file_handler::clear_file(&path) {
+                    Ok(_) => println!("Success clearing file"),
+                    Err(error) => println!("There was an error clearing the file: {}", error)
+                }
+            },
+            Err(error) => println!("There was an error getting the path to the file: {}", error)
+        }
     }
 }
 
