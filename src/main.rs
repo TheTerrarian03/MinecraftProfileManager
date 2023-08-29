@@ -2,14 +2,19 @@
 mod ui;
 mod path_handler;
 mod file_handler;
+mod data_handler;
 
 fn main() {
-    // get path to mc
-    let mc_path = path_handler::get_minecraft_folder();
-    println!("{:?}", mc_path);
-
     // check files
-    file_handler::validate_files();
+    match file_handler::validate_files() {
+        Ok(_) => { },
+        Err(error) => {
+            if error == "No Minecraft Path" {
+                println!("It looks like the .minecraft folder exists. Please install Minecraft to the default place and then run this program again!");
+                panic!("{}", error)
+            }
+        }
+    }
 
     // run ui loop
     ui::ui_mainloop();

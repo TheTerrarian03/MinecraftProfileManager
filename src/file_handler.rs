@@ -1,38 +1,51 @@
+use std::fs;
 use std::io::Write;
 // file_handler.rs
 use std::{fs::File, io::Read};
 use std::path::Path;
-use crate::path_handler;
+use crate::{path_handler, data_handler};
 
 
-const INFO_FILE_DEFUALT: &str = "Some info here!\nEnjoy :D\n-Logan M.";
+pub fn validate_files() -> Result<(), String> {
+    // check if minecraft exists
+    let mc_path = path_handler::get_minecraft_folder();
+    if !mc_path.exists() {
+        return Err("No Minecraft Path".to_string());
+    }
 
-pub fn validate_files() {
-    // let info_file_path = path_handler::get_info_file_path();
+    // check if profiles json exists at the required path
+    let profiles_path = path_handler::get_profiles_json_path();
+    if !profiles_path.exists() {
+        // doesn't exist, try to write default profile to json
+        write_default_profiles_json();
+    }
 
-    // match info_file_path {
-    //     Ok(path) => {
-    //         if Path::new(&path).exists() {
-    //             println!("INFO FILE successfully checked (exists)");
-    //         } else {
-    //             println!("INFO FILE does not exist");
-
-    //             match File::create(path) {
-    //                 Ok(mut file) => {
-    //                     if let Err(err) = file.write_all(INFO_FILE_DEFUALT.as_bytes()) {
-    //                         println!("Error making INFO FILE, {}", err)
-    //                     } else {
-    //                         println!("INFO FILE successfully made")
-    //                     }
-    //                 },
-    //                 Err(err) => println!("There was an error creating INFO FILE, {}", err)
-    //             }
-    //         }
-    //     },
-    //     Err(_) => println!("There was an error checking INFO FILE")
-    // }
+    // all good
+    Ok(())
 }
 
+// function to create the default profiles json file
+// WORKS!
+pub fn write_default_profiles_json() {
+    // get expected path to json file
+    let profiles_path = path_handler::get_profiles_json_path();
+
+    println!("{:?}", profiles_path);
+
+    // get parents of that json file path (config folder)
+    let config_folder = path_handler::get_config_folder_path();
+
+    // make sure necessary folders exist/have been made
+    fs::create_dir_all(config_folder).expect("Failed to make neccessary folders for profile json");
+
+    // file obj
+    let mut file = File::create(profiles_path).expect("Unable to open path to profiles json");
+
+    // write defaults to json file
+    file.write_all(data_handler::DEFAULT_PROFILES_DATA.as_bytes()).expect("Failed to write to profiles json");
+}
+
+/// Generic file methods
 pub fn read_file(file_path: &std::path::PathBuf) -> Result<String, std::io::Error> {
     let mut file = File::open(file_path)?;
     let mut content = String::new();

@@ -20,10 +20,10 @@ pub fn get_config_folder_path() -> PathBuf {
         // Windows
         let appdata = env::var("APPDATA").expect("APPDATA folder not found!");
         PathBuf::from(appdata).join(PROGRAM_FOLDER_NAME)
-    } else if cfg!(target_os = "maxos") || cfg!(target_os = "linux") {
+    } else if cfg!(target_os = "macos") || cfg!(target_os = "linux") {
         // Mac/Linux
         let home = env::var("HOME").expect("HOME folder not found!");
-        PathBuf::from(home).join(PROGRAM_FOLDER_NAME)
+        PathBuf::from(home).join(".config").join(PROGRAM_FOLDER_NAME)
     } else {
         unimplemented!("Unsupported Operating System! (Unable to make path to minecraft folder)")
     };
@@ -34,7 +34,7 @@ pub fn get_config_folder_path() -> PathBuf {
 // function to return path 
 pub fn get_profiles_json_path() -> PathBuf {
     // get config folder path
-    let mut config_folder = get_config_folder_path();
+    let config_folder = get_config_folder_path();
 
     // add json name
     config_folder.join(PROFILES_FILE_NAME)
