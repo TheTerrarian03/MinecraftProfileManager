@@ -1,9 +1,12 @@
-use std::fs;
+use std::collections::HashMap;
+use std::fs::{self, OpenOptions};
 use std::io::Write;
 // file_handler.rs
 use std::{fs::File, io::Read};
 use std::path::Path;
+use crate::data_handler::Profile;
 use crate::{path_handler, data_handler};
+use serde_json::Value;
 
 
 pub fn validate_files() -> Result<(), String> {
@@ -44,6 +47,104 @@ pub fn write_default_profiles_json() {
     // write defaults to json file
     file.write_all(data_handler::DEFAULT_PROFILES_DATA.as_bytes()).expect("Failed to write to profiles json");
 }
+
+/// Minecraft-specific methods
+// Main func, calls other funcs, returns true if there was an error
+pub fn write_config_to_minecraft(profile: &Profile) -> bool {
+    let mut errors: u32 = 0;
+    errors += write_run_settings(&profile.run_options);
+    errors += write_acc_name(&profile.run_options.new_name);
+    errors += write_options_s_settings("options.txt", &profile.options, ":");
+    errors += write_options_s_settings("optionsshaders.txt", &profile.optionsshaders, "=");
+    
+    if errors > 0 {
+        return true
+    }
+    false
+}
+
+// write run settings to config.ini in config path
+fn write_run_settings(run_options: &data_handler::RunOptions) -> u32 {
+    // path to file
+    let run_settings_path = path_handler::get_run_settings_path();
+    
+    // clear cfg file
+    clear_file(&run_settings_path).expect("Failed to clear run_settings.cfg");
+
+    // file to write to
+    let mut file = File::create(run_settings_path).expect("Failed to create run_settings.cfg");
+
+    // write settings
+    file.write_all(format!("run_offline={}\n", run_options.run_offline.to_string()).as_bytes()).expect("Failed to write data to run_settings.cfg");
+    file.write_all(format!("change_name={}\n", run_options.change_name.to_string()).as_bytes()).expect("Failed to write data to run_settings.cfg");
+    file.write_all(format!("new_name={}\n", run_options.new_name).as_bytes()).expect("Failed to write data to run_settings.cfg");
+    file.write_all(format!("auto_click_play={}\n", run_options.auto_click_play.to_string()).as_bytes()).expect("Failed to write data to run_settings.cfg");
+
+    0
+}
+
+// write account data for manual name
+fn write_acc_name(new_name: &String) -> u32 {
+    // file to load
+    let launcher_acc_path = path_handler::get_minecraft_folder().join("launcher_accounts.json");
+
+    // Load and parse the launcher_accounts.json file
+    let mut acc_file = OpenOptions::new().read(true).write(true).open(&launcher_acc_path).expect("Unable to load launcher accounts file");
+    let mut data_str = String::new();
+    acc_file.read_to_string(&mut data_str).expect("Unable to read launcher accounts data to string");
+    let mut data: Value = serde_json::from_str(&data_str).expect("Unable to convert launcher accounts data to json");
+
+    println!("{}", data);
+
+    // Collect account IDs
+    let account_ids: Vec<String> = data["accounts"].as_object().unwrap().keys().cloned().collect();
+
+    // Update names
+    for account_id in &account_ids {
+        if let Some(account) = data["accounts"].get_mut(account_id) {
+            if let Some(mc_profile) = account["minecraftProfile"].as_object_mut() {
+                mc_profile.insert("name".to_string(), Value::String(new_name.to_string()));
+            }
+        }
+    }
+
+    clear_file(&launcher_acc_path).expect("Unable to clear json file");
+    acc_file.write_all(serde_json::to_string_pretty(&data).expect("Unable to convert json data to string").as_bytes()).expect("Unable to write data to launcher accounts file");
+    
+    0
+}
+
+// write options.txt or optionsshaders.txt settings
+fn write_options_s_settings(file_name: &str, custom_options: &HashMap<String, String>, seperator: &str) -> u32 {
+    // path to file
+    let file_path = path_handler::get_minecraft_folder().join(file_name);
+
+    // existing content to go over
+    let file_content = fs::read_to_string(&file_path).expect("Failed to open the intended options file");
+
+    // new content to write out
+    let mut new_options_data = String::new();
+
+    // loop to go over lines and options
+    for line in file_content.lines() {
+        let mut overwritten = false;
+        for (cust_option, cust_value) in custom_options {
+            if line.starts_with(cust_option) {
+                new_options_data += &format!("{}{}{}\n", cust_option, seperator, cust_value);
+                overwritten = true;
+            }
+        }
+        if !overwritten {
+            new_options_data += line;
+            new_options_data += "\n";
+        }
+    }
+
+    fs::write(file_path, new_options_data).expect("Failed to write new data to intended options file");
+
+    0
+}
+
 
 /// Generic file methods
 pub fn read_file(file_path: &std::path::PathBuf) -> Result<String, std::io::Error> {

@@ -17,7 +17,9 @@ mod prompts {
         println!("3) Edit A Profile");
         println!("4) Make New Profile");
         println!("5) Remove A Profile");
-        println!("6) Quit program");
+        println!("6) Write configuration to Minecraft files");
+        println!("7) Run Minecraft");
+        println!("8) Quit program");
         input_symbol();
     }
 
@@ -79,7 +81,9 @@ mod menus {
             3 => { edit_profile_menu();          false },
             4 => { new_profile_menu();           false },
             5 => { remove_profile_menu();        false },
-            6 => { println!("Quitting program"); true  },
+            6 => { write_menu();                 false },
+            7 => { run_menu();                   false },
+            8 => { println!("Quitting program"); true  },
             _ => { println!("Invalid input");    false }
         }
     }
@@ -205,7 +209,7 @@ mod menus {
             prompts::input_symbol();
             let mut new_name = String::new();
             io::stdin().read_line(&mut new_name).expect("Failed to read user input");
-            edit_profile.run_options.new_name = new_name;
+            edit_profile.run_options.new_name = new_name.trim().to_string();
 
             // auto click play option
             println!("\nWould you like to automatically click play when Minecraft is launched? (y/N):");
@@ -228,7 +232,7 @@ mod menus {
         let change_options = change_options.trim();
 
         if change_options == "y" {
-            edit_lines_mainloop(&mut edit_profile.options)
+            edit_lines_mainloop(&mut edit_profile.options, ":")
         }
 
         // ask if user wants to edit optionsshaders.txt settings
@@ -240,7 +244,7 @@ mod menus {
         let change_optionsshaders = change_optionsshaders.trim();
 
         if change_optionsshaders == "y" {
-            edit_lines_mainloop(&mut edit_profile.optionsshaders)
+            edit_lines_mainloop(&mut edit_profile.optionsshaders, "=")
         }
 
         println!("\nThere are no more settings to change.");
@@ -250,7 +254,7 @@ mod menus {
         data_handler::write_profiles_data(&profiles)
     }
 
-    pub fn edit_lines_mainloop(custom_lines: &mut HashMap<String, String>) {
+    pub fn edit_lines_mainloop(custom_lines: &mut HashMap<String, String>, seperator: &str) {
         // user interactity loop
         loop {
             println!("\nHere are the current custom options saved:");
@@ -266,7 +270,7 @@ mod menus {
 
             if edit_command.starts_with("add ") {
                 let new_text = &edit_command[4..];
-                let parts: Vec<&str> = new_text.split(":").collect();
+                let parts: Vec<&str> = new_text.split(seperator).collect();
                 if let Some(key) = parts.get(0) {
                     if let Some(value) = parts.get(1) {
                         custom_lines.insert(key.to_string(), value.to_string());
@@ -340,6 +344,21 @@ mod menus {
         }
 
         data_handler::write_profiles_data(&profiles);
+    }
+
+    pub fn write_menu() {
+        println!("\nWriting config to Minecraft Files...");
+
+        // get profiles data
+        let profiles = data_handler::get_profiles_data();
+        let default_name = data_handler::get_default_profile_name(&profiles).expect("Failed to get default profile.");
+        let chosen_profile = data_handler::get_data_for_profile(&profiles, &default_name).expect("Failed to get data for default profile");
+
+        file_handler::write_config_to_minecraft(&chosen_profile);
+    }
+
+    pub fn run_menu() {
+
     }
 }
 

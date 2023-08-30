@@ -1,0 +1,27 @@
+{
+    "accounts" : {
+        "123456789" : {
+        "accessToken" : "",
+        "accessTokenExpiresAt" : "123456789",
+        "avatar" : "data:image/png;",
+        "eligibleForMigration" : false,
+        "hasMultipleProfiles" : false,
+        "inForcedMigration" : false,
+        "legacy" : false,
+        "licenseProductIds" : [],
+        "localId" : "123456789",
+        "minecraftProfile" : {
+            "id" : "123456789",
+            "name" : "a_Username",
+            "requiresProfileNameChange" : false
+        },
+        "persistent" : true,
+        "remoteId" : "123456789",
+        "type" : "Xbox",
+        "userProperites" : [],
+        "username" : "a_Username"
+        }
+    },
+    "activeAccountLocalId" : "123456789",
+    "mojangClientToken" : ""
+}
