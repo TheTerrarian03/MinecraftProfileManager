@@ -56,7 +56,7 @@ const DEFAULT_PROFILE: &str = r#"
     "run_options": {
         "run_offline": false,
         "change_name": false,
-        "new_name": "N/A",
+        "new_name": "none",
         "auto_click_play": true
     },
     "options": {
@@ -69,6 +69,8 @@ const DEFAULT_PROFILE: &str = r#"
 "#;
 
 const DEFUALT_PROFILE_NAME: &str = "New Profile";
+
+pub const DEFUALT_RUN_SETTINGS: &str = "run_offline=false\nchange_name=false\nnew_name=none\nauto_click_play=false\n";
 
 /// functions for reading/writing data
 pub fn get_default_profiles_data() -> ProfilesData {

@@ -3,7 +3,7 @@ use std::fs::{self, OpenOptions};
 use std::io::Write;
 // file_handler.rs
 use std::{fs::File, io::Read};
-use std::path::Path;
+use std::path::{Path, self};
 use crate::data_handler::Profile;
 use crate::{path_handler, data_handler};
 use serde_json::Value;
@@ -21,6 +21,13 @@ pub fn validate_files() -> Result<(), String> {
     if !profiles_path.exists() {
         // doesn't exist, try to write default profile to json
         write_default_profiles_json();
+    }
+
+    // check if run_settings.cfg file exists
+    let run_settings_path = path_handler::get_run_settings_path();
+    if !run_settings_path.exists() {
+        // doesn't exist, try to write default contents to file
+        write_default_run_settings();
     }
 
     // all good
@@ -48,12 +55,32 @@ pub fn write_default_profiles_json() {
     file.write_all(data_handler::DEFAULT_PROFILES_DATA.as_bytes()).expect("Failed to write to profiles json");
 }
 
+pub fn write_default_run_settings() {
+    // get expected path to file
+    let run_settings_path = path_handler::get_run_settings_path();
+
+    // get parent folder of that path (config folder)
+    let config_folder = path_handler::get_config_folder_path();
+
+    // make sure necessary folders exist/have been made
+    fs::create_dir_all(config_folder).expect("Failed to make neccessary folders for run settings cfg");
+
+    // file obj
+    let mut file = File::create(run_settings_path).expect("Unable to open path to run settings cfg");
+
+    // write default content to file
+    file.write_all(data_handler::DEFUALT_RUN_SETTINGS.as_bytes()).expect("Failed to write to run settings cfg");
+    
+}
+
 /// Minecraft-specific methods
 // Main func, calls other funcs, returns true if there was an error
 pub fn write_config_to_minecraft(profile: &Profile) -> bool {
     let mut errors: u32 = 0;
     errors += write_run_settings(&profile.run_options);
-    errors += write_acc_name(&profile.run_options.new_name);
+    if profile.run_options.change_name {
+        errors += write_acc_name(&profile.run_options.new_name);
+    }
     errors += write_options_s_settings("options.txt", &profile.options, ":");
     errors += write_options_s_settings("optionsshaders.txt", &profile.optionsshaders, "=");
     
@@ -85,11 +112,12 @@ fn write_run_settings(run_options: &data_handler::RunOptions) -> u32 {
 
 // write account data for manual name
 fn write_acc_name(new_name: &String) -> u32 {
-    // file to load
+    // file path to load
     let launcher_acc_path = path_handler::get_minecraft_folder().join("launcher_accounts.json");
 
-    // Load and parse the launcher_accounts.json file
-    let mut acc_file = OpenOptions::new().read(true).write(true).open(&launcher_acc_path).expect("Unable to load launcher accounts file");
+    // Load the launcher_accounts.json file in read mode
+    let mut acc_file = File::open(&launcher_acc_path).expect("Unable to load launcher accounts file");
+    // read the data from the file using some ChatGPT magic I have no idea what is happening    
     let mut data_str = String::new();
     acc_file.read_to_string(&mut data_str).expect("Unable to read launcher accounts data to string");
     let mut data: Value = serde_json::from_str(&data_str).expect("Unable to convert launcher accounts data to json");
@@ -108,7 +136,13 @@ fn write_acc_name(new_name: &String) -> u32 {
         }
     }
 
+    // clear file
     clear_file(&launcher_acc_path).expect("Unable to clear json file");
+
+    // close file and re-open in write mode
+    drop(acc_file);
+    let mut acc_file = File::create(&launcher_acc_path).expect("Unable to open launcher accounts file");
+
     acc_file.write_all(serde_json::to_string_pretty(&data).expect("Unable to convert json data to string").as_bytes()).expect("Unable to write data to launcher accounts file");
     
     0

@@ -69,3 +69,19 @@ pub fn get_minecraft_folder() -> PathBuf {
         unimplemented!("Unsupported Operating System! (Unable to make path to minecraft folder)")
     }
 }
+
+// function for minecraft program paths on different os's
+pub fn get_minecraft_program_path() -> PathBuf {
+    if cfg!(target_os = "windows") {
+        // Windows
+        PathBuf::from("C:\\Program Files (x86)\\Minecraft Launcher\\MinecraftLauncher.exe")
+    } else if cfg!(target_os = "macos") {
+        // Mac
+        PathBuf::from("/Applications/Minecraft.app")
+    } else if cfg!(target_os = "linux") {
+        // Linux
+        unimplemented!("Unsupported Operating System! (Linux not supported yet)")
+    } else {
+        unimplemented!("Unsupported Operating System! (Unable to make path to minecraft executable)")
+    }
+}

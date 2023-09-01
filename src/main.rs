@@ -3,6 +3,7 @@ mod ui;
 mod path_handler;
 mod file_handler;
 mod data_handler;
+mod ext_app_handler;
 
 fn main() {
     // check files

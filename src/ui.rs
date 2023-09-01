@@ -66,6 +66,7 @@ mod prompts {
 
 mod menus {
     use crate::data_handler;
+    use crate::ext_app_handler;
     use crate::path_handler;
     use crate::file_handler;
     use super::prompts;
@@ -183,7 +184,7 @@ mod menus {
 
         if change_run == "y" {
             // run offline
-            println!("\nWould you like to run Minecraft offlne? (y/N):");
+            println!("\nWould you like to run Minecraft offline? (y/N):");
             prompts::input_symbol();
             let mut run_offline_choice = String::new();
             io::stdin().read_line(&mut run_offline_choice).expect("Failed to read user input");
@@ -358,7 +359,21 @@ mod menus {
     }
 
     pub fn run_menu() {
+        // get profiles data
+        let profiles = data_handler::get_profiles_data();
+        let default_name = data_handler::get_default_profile_name(&profiles).expect("Failed to get default profile.");
+        let chosen_profile = data_handler::get_data_for_profile(&profiles, &default_name).expect("Failed to get data for default profile");
+        
+        println!("\nUsing Profile {}...", default_name);
 
+        write_menu();
+
+        println!("\nOpening Minecraft...");
+
+        let run_offline = chosen_profile.run_options.run_offline;
+        let auto_click_play = chosen_profile.run_options.auto_click_play;
+
+        ext_app_handler::open_minecraft(run_offline, auto_click_play);
     }
 }
 
