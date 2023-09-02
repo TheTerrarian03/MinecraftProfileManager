@@ -39,10 +39,10 @@ pub fn open_minecraft(run_offline: bool, auto_click_play: bool) {
 fn disable_wifi() {
     if cfg!(target_os = "windows") {
         // Windows
-        // Command::new("cmd")
-        //     .args(&["/C", "start", "", executable_path.to_str().unwrap()])
-        //     .status()
-        //     .expect("Unable to open Minecraft! (Windows)");
+        Command::new("cmd")
+            .args(&["/C", ""])
+            .status()
+            .expect("Unable to open Minecraft! (Windows)");
     } else if cfg!(target_os = "macos") {
         // Mac
         Command::new("networksetup")
