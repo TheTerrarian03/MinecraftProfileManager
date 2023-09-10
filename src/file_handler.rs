@@ -3,7 +3,7 @@ use std::fs::{self, OpenOptions};
 use std::io::Write;
 // file_handler.rs
 use std::{fs::File, io::Read};
-use std::path::{Path, self};
+use std::path::{Path, self, PathBuf};
 use crate::data_handler::Profile;
 use crate::{path_handler, data_handler};
 use serde_json::Value;
@@ -28,6 +28,13 @@ pub fn validate_files() -> Result<(), String> {
     if !run_settings_path.exists() {
         // doesn't exist, try to write default contents to file
         write_default_run_settings();
+    }
+
+    // check if run bat file exists
+    let run_bat_path = path_handler::get_run_bat_path();
+    if !run_bat_path.exists() {
+        // doesn't exist, try to make file
+        make_run_bat_file(&run_bat_path);
     }
 
     // all good
@@ -179,6 +186,20 @@ fn write_options_s_settings(file_name: &str, custom_options: &HashMap<String, St
     0
 }
 
+// method for making bat file to run
+pub fn make_run_bat_file(file_path: &std::path::PathBuf) {
+    // get content to write out
+    let bat_content = data_handler::BAT_CONTENT;
+
+    // clear file
+    clear_file(&file_path).expect("Unable to clear json file");
+
+    // open file
+    let mut file = File::create(file_path).expect("Unable to open bat file!");
+
+    // write data
+    file.write_all(bat_content.as_bytes()).expect("Unable to write bat content to bat file!");
+}
 
 /// Generic file methods
 pub fn read_file(file_path: &std::path::PathBuf) -> Result<String, std::io::Error> {

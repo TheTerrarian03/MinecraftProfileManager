@@ -41,7 +41,7 @@ for /f "tokens=1,2 delims==" %%a in (%SETTINGS_FILE%) do (
 
 : if working with wifi, ask for admin access
 if %OFFLINE% (
-        if not "%1"=="am_admin" (
+    if not "%1"=="am_admin" (
         powershell -Command "Start-Process -Verb RunAs -FilePath '%0' -ArgumentList 'am_admin'"
         exit /b 0
     )

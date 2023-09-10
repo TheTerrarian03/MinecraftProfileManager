@@ -9,6 +9,7 @@ use std::env::current_exe;
 const PROGRAM_PATH_FILE: &str = "ProgramPaths.json";
 const PROFILES_FILE_NAME: &str = "MinecraftPlayProfiles.json";
 const RUN_FILE_NAME: &str = "run_settings.cfg";
+const RUN_BAT_FILE_NAME: &str = "RunMinecraft.bat";
 
 const PROGRAM_FOLDER_NAME: &str = "MinecraftProfileManager";
 
@@ -47,6 +48,14 @@ pub fn get_run_settings_path() -> PathBuf {
 
     // add run file name
     config_folder.join(RUN_FILE_NAME)
+}
+
+pub fn get_run_bat_path() -> PathBuf {
+    // get config folder path
+    let config_folder = get_config_folder_path();
+
+    // add bat name
+    config_folder.join(RUN_BAT_FILE_NAME)
 }
 
 // function to get Minecraft path
